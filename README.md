@@ -1,2 +1,2 @@
-# sumologic-vSphere
-SumoLogic integration with vSphere
+# sumologic-vmware
+SumoLogic Integrations with VMware Products
