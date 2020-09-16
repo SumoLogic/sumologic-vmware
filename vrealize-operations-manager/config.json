@@ -1,0 +1,23 @@
+{
+  "DEFAULT_THREADSIZE_POOL": 4,
+  "BATCH_SIZE": 50,
+  "SSL_VERIFY":"False",
+  "SSL_CAPATH":"",
+  "GET_ALL_METRICS":"False",
+  "BACKFILL_HOURS":"1",
+  "resources": [
+    {
+      "adapterKind": "VMware",
+      "keys": [
+        "guestfilesystem|capacity_total",
+        "cpu|capacity_provisioned",
+        "cpu|numberToRemove",
+        "cpu|numberToAdd",
+        "cpu|demandmhz",
+        "guestfilesystem|usage_total"
+      ],
+      "resourceKind": "VirtualMachine",
+      "sampleno": 1
+    }
+  ]
+}
