@@ -2,7 +2,7 @@
 
 The Sumo Logic vRealize Operations Manager provides an established framework to extract metrics from vRealize Operations Manager and forward to a syslog Sumo Logic collector endpoint.
 
-For installation and usage, please look at Sumo Logic vRealize Operations Manager Help Document.
+For installation and usage, please look at [Sumo Logic vRealize Operations Manager Help Document](https://help.sumologic.com/03Send-Data/Collect-from-Other-Data-Sources/Collect_from_VMware_vRealize/Collect_metrics_from_VMware_vRealize_Operations_Manager_8_Enterprise).
 
 ## License
 
