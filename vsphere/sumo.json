@@ -1,0 +1,8 @@
+{
+ "CONFIG": {
+	"BATCH_MORLIST_SIZE" : 50,
+	"DEFAULT_THREADSIZE_POOL" : 5,
+  "SSL_VERIFY" : "False",
+  "SSL_CAPATH" : ""
+	}
+}
