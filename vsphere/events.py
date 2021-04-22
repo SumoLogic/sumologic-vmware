@@ -211,6 +211,7 @@ def main():
     eventManager = serverConn.content.eventManager
     eventCollector = eventManager.CreateCollectorForEvents(filterSpec)
     eventCollector.RewindCollector()
+    aboutInfo = serverConn.content.about
     lastReadTime = None
     while True:
         packetContent = ""
@@ -254,6 +255,9 @@ def main():
 
                 if hasattr(event, 'datacenter') and getattr(event, 'datacenter') is not None:
                     packetContent = packetContent + separator + "datacenterMoref=" + str(event.datacenter.datacenter)
+
+                if hasattr(aboutInfo, 'instanceUuid') and getattr(aboutInfo, 'instanceUuid') is not None:
+                    packetContent = packetContent + separator + "vCenterUUID=" + str(aboutInfo.instanceUuid)
                 # Set Dummy Priority to 31 i.e. Debug for System Daemons
                 packetContent = "<31>1 " + packetContent + "\n"
 
