@@ -34,7 +34,7 @@ BATCH_MORLIST_SIZE = 50
 # Maximum number of objects to collect at once by the propertyCollector.
 BATCH_COLLECTOR_SIZE = 500
 
-DEFAULT_COLLECTION_LEVEL = 2
+DEFAULT_COLLECTION_LEVEL = 4
 
 REALTIME_RESOURCES = {'vm', 'host'}
 
