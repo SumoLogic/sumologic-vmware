@@ -135,5 +135,62 @@ BASIC_METRICS = {
         'unit': 'second',
         'rollup': 'latest',
         'entity': ['VirtualMachine', 'HostSystem']
+    },
+    # Readiness
+    # Compatibility 6.0 / 6.5/ 6.7
+    'cpu.readiness': {
+        's_type': 'rate',
+        'unit': 'percent',
+        'rollup': 'average',
+        'entity': ['VirtualMachine', 'HostSystem']
+    },
+    # CPU wait
+    # Compatibility 5.0/ 5.1/ 5.5/ 6.0/ 6.5/ 6.7
+    'cpu.wait': {
+        's_type': 'delta',
+        'unit': 'millisecond',
+        'rollup': 'summation',
+        'entity': ['VirtualMachine', 'HostSystem']
+    },
+    #CPU Total Capacity
+    # Compatibility 5.0/ 5.1/ 5.5/ 6.0/ 6.5/ 6.7
+    'cpu.totalCapacity': {
+        's_type': 'absolute',
+        'unit': 'megaHertz',
+        'rollup': 'average',
+        'entity': ['HostSystem']
+    },
+
+    # Compatibility 5.5/ 6.0/ 6.5/ 6.7
+    'mem.vmmemctl': {
+        's_type': 'absolute',
+        'unit': 'kiloBytes',
+        'rollup': 'average',
+        'entity': ['VirtualMachine','HostSystem']
+    },
+    # Commands Aborted
+    # Compatibility 5.0 / 5.1 / 5.5 / 6.0 / 6.5 / 6.7
+    'disk.commandsAborted': {
+        's_type': 'delta',
+        'unit': 'number',
+        'rollup': 'summation',
+        'entity': ['VirtualMachine','HostSystem']
+    },
+    #Disk Resets
+    # Compatibility 5.0 / 5.1 / 5.5 / 6.0 / 6.5 / 6.7
+    'disk.busResets': {
+        's_type': 'delta',
+        'unit': 'number',
+        'rollup': 'summation',
+        'entity': ['VirtualMachine','HostSystem','Datastore']
+    },
+    # Queue Latency
+    # Compatibility 5.0 / 5.1 / 5.5 / 6.0 / 6.5 / 6.7
+    'disk.queueLatency': {
+        's_type': 'absolute',
+        'unit': 'millisecond',
+        'rollup': 'average',
+        'entity': ['HostSystem']
     }
+    
 }
