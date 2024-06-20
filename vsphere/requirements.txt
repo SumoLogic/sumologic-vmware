@@ -1,0 +1,4 @@
+cryptography==42.0.8
+pyVim==3.0.3
+pyvmomi==8.0.2.0.1
+six==1.16.0
