@@ -24,7 +24,7 @@ from cache_config import CacheConfig
 from objects_queue import ObjectsQueue
 from mor_cache import MorCache, MorNotFoundError
 from metadata_cache import MetadataCache, MetadataNotFoundError
-
+from get_tags import get_tags_for_vm
 # vCenter sampling interval
 VCENTER_REALTIME_INTERVAL = 20
 # Default Threadpool size
@@ -497,7 +497,7 @@ class VSphereMetrics():
         return value
 
     @trace_method
-    def _collect_vcenter_metrics_async(self, instance, query_specs):
+    def _collect_vcenter_metrics_async(self, instance, query_specs,category_tag_dict):
         """
         This procedure collects the metrics listed in the morlist for one MOR
         """
@@ -558,6 +558,14 @@ class VSphereMetrics():
 
                     date_time = mor_perfs.sampleInfo[0].timestamp
                     epoch = str(date_time.timestamp()).split('.')[0]
+                    if mor['mor_type']!= None and mor['mor_type'] == 'vm':
+                        if mor['hostname'] in category_tag_dict:
+                            tags = category_tag_dict[mor['hostname']]
+                            for cat, tag_list in tags.items():
+                                output_string = output_string + " " + cat + "=" + ",".join(tag_list)
+                        else:
+                            self.logger.info("No tags found for VM %s\n", mor['hostname'])
+
                     output_string = output_string + " type=" + mor['mor_type'] + " hostname=" + str(mor['hostname']).replace(" ", "_") + " vcenter=" + instance.host + "  " + str(value) + " " + str(epoch) + "\n"
                     if targetSocket is not None:
                         try:
@@ -606,6 +614,10 @@ class VSphereMetrics():
         beginTime, endTime = self.prepareQueryTimeRange(instance.tsFileName)
 
         batch_size = self.batch_morlist_size or n_mors
+
+        # Collect tags for VMs
+        category_tag_dict = get_tags_for_vm(instance.host, instance.user, instance.password)
+
         for batch in self.mor_cache.mors_batch(i_key, batch_size):
             query_specs = []
             for mor_name, mor in batch.items():
@@ -627,7 +639,7 @@ class VSphereMetrics():
                 query_specs.append(query_spec)
 
             if query_specs:
-                self.pool.apply_async(self._collect_vcenter_metrics_async, args=(instance, query_specs))
+                self.pool.apply_async(self._collect_vcenter_metrics_async, args=(instance, query_specs,category_tag_dict))
         self.updateLastReadTime(endTime, instance.tsFileName)
         self.logger.info('VM Count::' + str(vm_count) + '\n')
 
