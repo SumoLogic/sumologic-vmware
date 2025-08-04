@@ -562,11 +562,12 @@ class VSphereMetrics():
                         if mor['hostname'] in category_tag_dict:
                             tags = category_tag_dict[mor['hostname']]
                             for cat, tag_list in tags.items():
-                                output_string = output_string + " " + cat + "=" + ",".join(tag_list)
+                                output_string = output_string + " " + cat.replace(" ", "") + "=" + ",".join(s.replace(" ", "") for s in tag_list)
+                                self.logger.info("added tagging info %s\n", output_string)
                         else:
                             self.logger.info("No tags found for VM %s\n", mor['hostname'])
-
                     output_string = output_string + " type=" + mor['mor_type'] + " hostname=" + str(mor['hostname']).replace(" ", "_") + " vcenter=" + instance.host + "  " + str(value) + " " + str(epoch) + "\n"
+                    self.logger.info("Sending metric %s\n", output_string)
                     if targetSocket is not None:
                         try:
                             targetSocket.send(output_string.encode())

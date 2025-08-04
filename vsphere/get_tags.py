@@ -28,6 +28,11 @@ def get_tags_for_vm(vcenter_host, username, password):
             if cat_name not in cat_tag_dict:
                 cat_tag_dict[cat_name] = []
             cat_tag_dict[cat_name].append(tag_dict[ti].name)
-        vm_tags[vm.object_id.id] = cat_tag_dict
+        vm_name = ""
+        for v in vms:
+            if v.vm == vm.object_id.id:
+                vm_name = v.name
+                break
+        vm_tags[vm_name] = cat_tag_dict
     print(f"here is the list of vm_tags fetched from rest api client = {vm_tags}")
     return vm_tags
