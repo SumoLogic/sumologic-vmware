@@ -13,6 +13,7 @@ from pyVmomi import vim
 from pyVim.connect import SmartConnect, Disconnect
 from cryptography.fernet import Fernet
 from vmware_constants import event_type_list
+from get_tags import get_tags_for_vm
 
 
 def prepareQueryTimeRange(tsFileName, optBeginTime, optEndTime, logfile, logPrefix):
@@ -213,6 +214,9 @@ def main():
     eventCollector.RewindCollector()
     aboutInfo = serverConn.content.about
     lastReadTime = None
+
+    # get tagging information
+    vm_category_tag_dict = get_tags_for_vm(args.server, args.user, password)
     while True:
         packetContent = ""
         try:
@@ -258,6 +262,15 @@ def main():
 
                 if hasattr(aboutInfo, 'instanceUuid') and getattr(aboutInfo, 'instanceUuid') is not None:
                     packetContent = packetContent + separator + "vCenterUUID=" + str(aboutInfo.instanceUuid)
+                if hasattr(event, 'vm') and getattr(event, 'vm') is not None and event.vm.name in vm_category_tag_dict:
+                    category_tag_dict = vm_category_tag_dict[event.vm.name]
+                    cat_tag_info = ""
+                    category_separator=" | "
+                    for cat in sorted(category_tag_dict):
+                        tag_list = category_tag_dict[cat]
+                        tag_list_str = ",".join(s.replace(" ", "") for s in tag_list)
+                        cat_tag_info = cat_tag_info + cat.replace(" ", "") + "[" + tag_list_str + "]" + category_separator
+                    packetContent = packetContent + separator + "CategoryTagInfo=" + str(cat_tag_info)
                 # Set Dummy Priority to 31 i.e. Debug for System Daemons
                 packetContent = "<31>1 " + packetContent + "\n"
 
