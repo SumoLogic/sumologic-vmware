@@ -193,19 +193,21 @@ class VSphereMetrics():
         password = instance.password
 
         if instance.pass_encrypted:
-            pass_key = ""
             try:
-                with open(instance.key, 'rb') as key_file:
+                with open(instance.keyPath, 'rb') as key_file:
                     pass_key = key_file.read()
             except FileNotFoundError:
-                self.logger.critical(f"Error: Encryption key file '{instance.key}' not found.\n")
-                sys.exit(f"Error: Encryption key file '{instance.key}' not found.")
+                error = f"Error: Encryption key file '{instance.keyPath}' not found.\n"
+                self.logger.critical(error)
+                sys.exit(error)
             except PermissionError:
-                self.logger.critical(f"Error: Permission denied to read the encryption key file '{instance.key}'.\n")
-                sys.exit(f"Error: Permission denied to read the encryption key file '{instance.key}'.")
+                error = f"Error: Permission denied to read the encryption key file '{instance.keyPath}'."
+                self.logger.critical(error)
+                sys.exit(error)
             except Exception as e:
-                self.logger.critical(f"Error: Unable to read the encryption key file '{instance.key}'. Exception: {e}\n")
-                sys.exit(f"Error: Unable to read the encryption key file '{instance.key}'. Exception: {e}")
+                error = f"Error: Unable to read the encryption key file '{instance.keyPath}'. Exception: {e}"
+                self.logger.critical(error)
+                sys.exit(error)
             cipher_suite = Fernet(pass_key)
             uncipher_text = (cipher_suite.decrypt(bytes(instance.password, "utf-8")))
             password = bytes(uncipher_text).decode("utf-8") # convert to string
@@ -707,7 +709,7 @@ def setup_args():
                         action='store',
                         help='Is the password encrypted?', default=False)
 
-    parser.add_argument('-pK', '--key',
+    parser.add_argument('-pK', '--keyPath',
                         required=False,
                         action='store',
                         help='Encryption Key path', default=False)
@@ -739,7 +741,7 @@ def setup_args():
 
     args = parser.parse_args()
 
-    if args.pass_encrypted and args.key is None:
+    if args.pass_encrypted and args.keyPath is None:
         print("Encryption Key path is required if the password is encrypted.")
         sys.exit("Encryption Key path is required if the password is encrypted.")
 
