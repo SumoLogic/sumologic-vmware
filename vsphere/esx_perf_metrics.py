@@ -193,7 +193,22 @@ class VSphereMetrics():
         password = instance.password
 
         if instance.pass_encrypted:
-            cipher_suite = Fernet(instance.key)
+            try:
+                with open(instance.keyPath, 'rb') as key_file:
+                    pass_key = key_file.read()
+            except FileNotFoundError:
+                error = f"Error: Encryption key file '{instance.keyPath}' not found.\n"
+                self.logger.critical(error)
+                sys.exit(error)
+            except PermissionError:
+                error = f"Error: Permission denied to read the encryption key file '{instance.keyPath}'."
+                self.logger.critical(error)
+                sys.exit(error)
+            except Exception as e:
+                error = f"Error: Unable to read the encryption key file '{instance.keyPath}'. Exception: {e}"
+                self.logger.critical(error)
+                sys.exit(error)
+            cipher_suite = Fernet(pass_key)
             uncipher_text = (cipher_suite.decrypt(bytes(instance.password, "utf-8")))
             password = bytes(uncipher_text).decode("utf-8") # convert to string
 
@@ -694,10 +709,10 @@ def setup_args():
                         action='store',
                         help='Is the password encrypted?', default=False)
 
-    parser.add_argument('-pK', '--key',
+    parser.add_argument('-pK', '--keyPath',
                         required=False,
                         action='store',
-                        help='Encryption Key', default=False)
+                        help='Encryption Key path', default=False)
 
     parser.add_argument('-t', '--target',
                         required=True,
@@ -726,9 +741,9 @@ def setup_args():
 
     args = parser.parse_args()
 
-    if args.pass_encrypted and args.key is None:
-        print("Key is required if the password is encrypted")
-        sys.exit("Key is required if the password is encrypted")
+    if args.pass_encrypted and args.keyPath is None:
+        print("Encryption Key path is required if the password is encrypted.")
+        sys.exit("Encryption Key path is required if the password is encrypted.")
 
     return args
 
