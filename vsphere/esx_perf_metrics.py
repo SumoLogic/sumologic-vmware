@@ -193,7 +193,20 @@ class VSphereMetrics():
         password = instance.password
 
         if instance.pass_encrypted:
-            cipher_suite = Fernet(instance.key)
+            pass_key = ""
+            try:
+                with open(instance.key, 'rb') as key_file:
+                    pass_key = key_file.read()
+            except FileNotFoundError:
+                self.logger.critical(f"Error: Encryption key file '{instance.key}' not found.\n")
+                sys.exit(f"Error: Encryption key file '{instance.key}' not found.")
+            except PermissionError:
+                self.logger.critical(f"Error: Permission denied to read the encryption key file '{instance.key}'.\n")
+                sys.exit(f"Error: Permission denied to read the encryption key file '{instance.key}'.")
+            except Exception as e:
+                self.logger.critical(f"Error: Unable to read the encryption key file '{instance.key}'. Exception: {e}\n")
+                sys.exit(f"Error: Unable to read the encryption key file '{instance.key}'. Exception: {e}")
+            cipher_suite = Fernet(pass_key)
             uncipher_text = (cipher_suite.decrypt(bytes(instance.password, "utf-8")))
             password = bytes(uncipher_text).decode("utf-8") # convert to string
 
@@ -697,7 +710,7 @@ def setup_args():
     parser.add_argument('-pK', '--key',
                         required=False,
                         action='store',
-                        help='Encryption Key', default=False)
+                        help='Encryption Key path', default=False)
 
     parser.add_argument('-t', '--target',
                         required=True,
@@ -727,8 +740,8 @@ def setup_args():
     args = parser.parse_args()
 
     if args.pass_encrypted and args.key is None:
-        print("Key is required if the password is encrypted")
-        sys.exit("Key is required if the password is encrypted")
+        print("Encryption Key path is required if the password is encrypted.")
+        sys.exit("Encryption Key path is required if the password is encrypted.")
 
     return args
 

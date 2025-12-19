@@ -118,7 +118,7 @@ def setup_args():
     parser.add_argument('-pK', '--key',
                         required=False,
                         action='store',
-                        help='Encryption Key', default=False)
+                        help='Encryption Key path', default=False)
 
     args = parser.parse_args()
 
@@ -126,7 +126,7 @@ def setup_args():
         sys.exit("Target syslog server or file is required.")
 
     if args.pass_encrypted and args.key is None:
-        sys.exit("Key is required if the password is encrypted.")
+        sys.exit("Encryption Key path is required if the password is encrypted.")
 
     args = parser.parse_args()
 
@@ -194,7 +194,20 @@ def main():
                        "ssl verification disabled.\n")
     password = args.password
     if args.pass_encrypted:
-        cipher_suite = Fernet(args.key)
+        pass_key = ""
+        try:
+            with open(args.key, 'rb') as key_file:
+                pass_key = key_file.read()
+        except FileNotFoundError:
+            logfile.write(logPrefix + f"Error: Encryption key file '{args.key}' not found.\n")
+            sys.exit(logPrefix + f"Error: Encryption key file '{args.key}' not found.")
+        except PermissionError:
+            logfile.write(logPrefix + f"Error: Permission denied to read the encryption key file '{args.key}'.\n")
+            sys.exit(logPrefix + f"Error: Permission denied to read the encryption key file '{args.key}'.")
+        except Exception as e:
+            logfile.write(logPrefix + f"Error: Unable to read the encryption key file '{args.key}'. Exception: {e}\n")
+            sys.exit(logPrefix + f"Error: Unable to read the encryption key file '{args.key}'. Exception: {e}")
+        cipher_suite = Fernet(pass_key)
         uncipher_text = (cipher_suite.decrypt(bytes(args.password, "utf-8")))
         password = bytes(uncipher_text).decode("utf-8") # convert to string
 
